@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>학교 통합 플랫폼</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- 헤더 -->
+        <header class="header">
+            <h1>📚 학교 통합 플랫폼</h1>
+            <p>학사일정, 급식, 회의록, 건의사항을 한눈에 확인하세요!</p>
+        </header>
+
+        <!-- 네비게이션 -->
+        <nav class="nav-tabs">
+            <button class="nav-btn active" data-tab="schedule">📅 학사일정</button>
+            <button class="nav-btn" data-tab="meal">🍽️ 급식</button>
+            <button class="nav-btn" data-tab="minutes">📝 회의록</button>
+            <button class="nav-btn" data-tab="suggestions">💬 건의사항</button>
+            <a href="admin.html" class="nav-btn admin-link">🔧 관리자</a>
+        </nav>
+
+        <!-- 메인 콘텐츠 -->
+        <main class="main-content">
+            
+            <!-- 학사일정 탭 -->
+            <section id="schedule" class="tab-content active">
+                <h2>📅 학사일정</h2>
+                <div id="scheduleList" class="list-container">
+                    <p class="loading">로딩 중...</p>
+                </div>
+            </section>
+
+            <!-- 급식 탭 -->
+            <section id="meal" class="tab-content">
+                <h2>🍽️ 급식</h2>
+                <div id="mealList" class="list-container">
+                    <p class="loading">로딩 중...</p>
+                </div>
+            </section>
+
+            <!-- 회의록 탭 -->
+            <section id="minutes" class="tab-content">
+                <h2>📝 학생회 회의록</h2>
+                <div id="minutesList" class="list-container">
+                    <p class="loading">로딩 중...</p>
+                </div>
+            </section>
+
+            <!-- 건의사항 탭 -->
+            <section id="suggestions" class="tab-content">
+                <h2>💬 건의사항</h2>
+                <div class="suggestion-form">
+                    <input type="text" id="suggestionName" placeholder="이름 (선택사항, 빈칸이면 익명)">
+                    <textarea id="suggestionContent" placeholder="건의사항을 입력하세요..."></textarea>
+                    <button onclick="addSuggestion()">제출하기</button>
+                </div>
+                <div id="suggestionsList" class="list-container">
+                    <p class="loading">로딩 중...</p>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

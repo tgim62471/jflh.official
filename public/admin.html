@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>관리자 페이지 - 학교 통합 플랫폼</title>
+    <link rel="stylesheet" href="admin-style.css">
+</head>
+<body>
+    <div class="admin-container">
+        <!-- 헤더 -->
+        <header class="admin-header">
+            <h1>🔧 관리자 페이지</h1>
+            <a href="index.html" class="back-btn">← 돌아가기</a>
+        </header>
+
+        <!-- 네비게이션 -->
+        <nav class="admin-nav">
+            <button class="admin-nav-btn active" data-tab="schedule">📅 학사일정 관리</button>
+            <button class="admin-nav-btn" data-tab="meal">🍽️ 급식 관리</button>
+            <button class="admin-nav-btn" data-tab="minutes">📝 회의록 관리</button>
+            <button class="admin-nav-btn" data-tab="suggestions">💬 건의사항 확인</button>
+        </nav>
+
+        <!-- 메인 콘텐츠 -->
+        <main class="admin-main">
+
+            <!-- 학사일정 관리 -->
+            <section id="schedule" class="admin-tab-content active">
+                <h2>📅 학사일정 추가</h2>
+                <div class="form-group">
+                    <input type="date" id="scheduleDate" placeholder="날짜">
+                    <input type="text" id="scheduleTitle" placeholder="행사명 (예: 학교 축제, 중간고사)">
+                    <textarea id="scheduleDesc" placeholder="설명 (선택사항)"></textarea>
+                    <button onclick="adminAddSchedule()" class="btn-add">추가하기</button>
+                </div>
+                <h3>등록된 일정</h3>
+                <div id="adminScheduleList" class="admin-list">
+                    <p class="loading">로딩 중...</p>
+                </div>
+            </section>
+
+            <!-- 급식 관리 -->
+            <section id="meal" class="admin-tab-content">
+                <h2>🍽️ 급식 메뉴 추가</h2>
+                <div class="form-group">
+                    <input type="date" id="mealDate" placeholder="날짜">
+                    <textarea id="mealMenu" placeholder="급식 메뉴를 입력하세요 (예: 쌀밥, 미역국, 불고기, ...)"></textarea>
+                    <button onclick="adminAddMeal()" class="btn-add">추가하기</button>
+                </div>
+                <h3>등록된 급식</h3>
+                <div id="adminMealList" class="admin-list">
+                    <p class="loading">로딩 중...</p>
+                </div>
+            </section>
+
+            <!-- 회의록 관리 -->
+            <section id="minutes" class="admin-tab-content">
+                <h2>📝 회의록 추가</h2>
+                <div class="form-group">
+                    <input type="date" id="minutesDate" placeholder="회의 날짜">
+                    <input type="text" id="minutesTitle" placeholder="회의명 (예: 학생회 정기회의)">
+                    <textarea id="minutesContent" placeholder="회의 내용을 입력하세요"></textarea>
+                    <button onclick="adminAddMinutes()" class="btn-add">추가하기</button>
+                </div>
+                <h3>등록된 회의록</h3>
+                <div id="adminMinutesList" class="admin-list">
+                    <p class="loading">로딩 중...</p>
+                </div>
+            </section>
+
+            <!-- 건의사항 확인 -->
+            <section id="suggestions" class="admin-tab-content">
+                <h2>💬 학생 건의사항</h2>
+                <p class="info-text">학생들이 제출한 건의사항을 확인할 수 있습니다.</p>
+                <div id="adminSuggestionsList" class="admin-list">
+                    <p class="loading">로딩 중...</p>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <script src="admin-script.js"></script>
+</body>
+</html>
