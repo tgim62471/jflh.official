@@ -20,7 +20,7 @@
             <button class="nav-btn" data-tab="meal">🍽️ 급식</button>
             <button class="nav-btn" data-tab="minutes">📝 회의록</button>
             <button class="nav-btn" data-tab="suggestions">💬 건의사항</button>
-            <a href="admin.html" class="nav-btn admin-link">🔧 관리자</a>
+            <button class="nav-btn admin-btn" onclick="adminLogin()">🔧</button>
         </nav>
 
         <!-- 메인 콘텐츠 -->
@@ -67,5 +67,16 @@
     </div>
 
     <script src="script.js"></script>
+    <script>
+        // 관리자 로그인
+        function adminLogin() {
+            const password = prompt('관리자 암호를 입력하세요:');
+            if (password === '1234') { // 암호를 여기서 설정 (나중에 변경 가능)
+                window.location.href = 'admin.html';
+            } else if (password !== null) {
+                alert('암호가 틀렸습니다!');
+            }
+        }
+    </script>
 </body>
 </html>
