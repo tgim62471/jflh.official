@@ -1,10 +1,13 @@
 // API 기본 URL
 const API_URL = '';
 
+// 현재 달력 표시 월
+let currentCalendarDate = new Date();
+
 // 탭 전환 기능
 document.querySelectorAll('.nav-btn').forEach(btn => {
     btn.addEventListener('click', () => {
-        if (btn.classList.contains('admin-link')) return;
+        if (btn.classList.contains('admin-btn')) return;
         
         document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
         document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
@@ -19,7 +22,10 @@ document.querySelectorAll('.nav-btn').forEach(btn => {
 
 // 탭 로드 함수
 function loadTab(tabId) {
-    if (tabId === 'schedule') loadSchedule();
+    if (tabId === 'schedule') {
+        loadSchedule();
+        renderCalendar();
+    }
     else if (tabId === 'meal') loadMeal();
     else if (tabId === 'minutes') loadMinutes();
     else if (tabId === 'suggestions') loadSuggestions();
@@ -27,6 +33,78 @@ function loadTab(tabId) {
 
 // 초기 로드
 loadSchedule();
+renderCalendar();
+
+// ===== 달력 기능 =====
+function renderCalendar() {
+    const year = currentCalendarDate.getFullYear();
+    const month = currentCalendarDate.getMonth();
+    
+    // 월 제목 업데이트
+    document.getElementById('currentMonth').textContent = `${year}년 ${month + 1}월`;
+    
+    // 달력 그리기
+    const firstDay = new Date(year, month, 1).getDay();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    
+    let calendarHTML = '<div class="calendar-grid">';
+    
+    // 요일 헤더
+    const dayNames = ['일', '월', '화', '수', '목', '금', '토'];
+    dayNames.forEach(day => {
+        calendarHTML += `<div class="calendar-day-header">${day}</div>`;
+    });
+    
+    // 빈 칸
+    for (let i = 0; i < firstDay; i++) {
+        calendarHTML += '<div class="calendar-empty"></div>';
+    }
+    
+    // 날짜
+    for (let day = 1; day <= daysInMonth; day++) {
+        const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        calendarHTML += `<div class="calendar-date" onclick="selectDate('${dateStr}')">${day}</div>`;
+    }
+    
+    calendarHTML += '</div>';
+    document.getElementById('calendar').innerHTML = calendarHTML;
+    
+    // 일정이 있는 날짜 강조
+    highlightScheduleDates();
+}
+
+function previousMonth() {
+    currentCalendarDate.setMonth(currentCalendarDate.getMonth() - 1);
+    renderCalendar();
+}
+
+function nextMonth() {
+    currentCalendarDate.setMonth(currentCalendarDate.getMonth() + 1);
+    renderCalendar();
+}
+
+function selectDate(dateStr) {
+    // 선택된 날짜의 일정만 표시
+    loadSchedule();
+}
+
+function highlightScheduleDates() {
+    fetch(`${API_URL}/api/schedule`)
+        .then(res => res.json())
+        .then(data => {
+            const year = currentCalendarDate.getFullYear();
+            const month = currentCalendarDate.getMonth();
+            
+            document.querySelectorAll('.calendar-date').forEach(dateEl => {
+                const day = parseInt(dateEl.textContent);
+                const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                
+                if (data.some(s => s.date === dateStr)) {
+                    dateEl.classList.add('has-schedule');
+                }
+            });
+        });
+}
 
 // ===== 학사일정 =====
 async function loadSchedule() {
@@ -35,15 +113,24 @@ async function loadSchedule() {
         const data = await response.json();
         const container = document.getElementById('scheduleList');
         
-        if (data.length === 0) {
-            container.innerHTML = '<p class="loading">등록된 일정이 없습니다.</p>';
+        const year = currentCalendarDate.getFullYear();
+        const month = currentCalendarDate.getMonth();
+        
+        // 현재 달의 일정만 필터링
+        const monthSchedules = data.filter(s => {
+            const sDate = new Date(s.date);
+            return sDate.getFullYear() === year && sDate.getMonth() === month;
+        });
+        
+        if (monthSchedules.length === 0) {
+            container.innerHTML = '<p class="loading">이번달 일정이 없습니다.</p>';
             return;
         }
         
         // 날짜 기준으로 정렬
-        data.sort((a, b) => new Date(a.date) - new Date(b.date));
+        monthSchedules.sort((a, b) => new Date(a.date) - new Date(b.date));
         
-        container.innerHTML = data.map(schedule => `
+        container.innerHTML = monthSchedules.map(schedule => `
             <div class="list-item">
                 <div class="item-date">📅 ${formatDate(schedule.date)}</div>
                 <div class="item-title">${schedule.title}</div>
@@ -64,7 +151,7 @@ async function loadMeal() {
         const container = document.getElementById('mealList');
         
         if (data.length === 0) {
-            container.innerHTML = '<p class="loading">등록된 급식이 없습니다.</p>';
+            container.innerHTML = '<p class="loading">등록된 급식이 없습니다. (NEIS에서 자동으로 업데이트됩니다)</p>';
             return;
         }
         
