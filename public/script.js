@@ -26,7 +26,10 @@ function loadTab(tabId) {
         loadSchedule();
         renderCalendar();
     }
-    else if (tabId === 'meal') loadMeal();
+    else if (tabId === 'meal') {
+        loadMeal();
+        renderMealTable();
+    }
     else if (tabId === 'minutes') loadMinutes();
     else if (tabId === 'suggestions') loadSuggestions();
 }
@@ -34,6 +37,8 @@ function loadTab(tabId) {
 // 초기 로드
 loadSchedule();
 renderCalendar();
+loadMeal();
+renderMealTable();
 
 // ===== 달력 기능 =====
 function renderCalendar() {
@@ -84,7 +89,6 @@ function nextMonth() {
 }
 
 function selectDate(dateStr) {
-    // 선택된 날짜의 일정만 표시
     loadSchedule();
 }
 
@@ -148,24 +152,53 @@ async function loadMeal() {
     try {
         const response = await fetch(`${API_URL}/api/meal`);
         const data = await response.json();
-        const container = document.getElementById('mealList');
-        
-        if (data.length === 0) {
-            container.innerHTML = '<p class="loading">등록된 급식이 없습니다. (NEIS에서 자동으로 업데이트됩니다)</p>';
-            return;
-        }
-        
-        data.sort((a, b) => new Date(b.date) - new Date(a.date));
-        
-        container.innerHTML = data.map(meal => `
-            <div class="list-item">
-                <div class="item-date">🍽️ ${formatDate(meal.date)}</div>
-                <div class="item-content">${meal.menu}</div>
-            </div>
-        `).join('');
+        return data;
     } catch (error) {
         console.error('급식 로드 오류:', error);
-        document.getElementById('mealList').innerHTML = '<p class="loading">오류가 발생했습니다.</p>';
+        return [];
+    }
+}
+
+// 급식 테이블 렌더링
+async function renderMealTable() {
+    const meals = await loadMeal();
+    
+    // 7일치 데이터 초기화
+    for (let i = 0; i < 7; i++) {
+        document.getElementById(`b${i}`).textContent = '-';
+        document.getElementById(`l${i}`).textContent = '-';
+        document.getElementById(`d${i}`).textContent = '-';
+    }
+    
+    if (meals.length === 0) {
+        return;
+    }
+    
+    // 오늘 날짜부터 7일간의 데이터 정렬
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    for (let i = 0; i < 7; i++) {
+        const date = new Date(today);
+        date.setDate(date.getDate() + i);
+        const dateStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+        
+        // 해당 날짜의 급식 찾기
+        const meal = meals.find(m => m.date === dateStr);
+        
+        if (meal) {
+            // NEIS에서는 보통 중식만 제공하므로, 중식에 저장
+            // 만약 조식/석식도 있다면 menu에 구분되어 있을 것
+            const menuText = meal.menu || '-';
+            
+            // 간단히 중식에만 표시
+            document.getElementById(`l${i}`).textContent = menuText.substring(0, 50); // 길면 자르기
+        }
+        
+        // 요일 헤더 업데이트
+        const dayNames = ['월', '화', '수', '목', '금', '토', '일'];
+        const dayOfWeek = (date.getDay() + 6) % 7; // 일요일을 0으로 만들기
+        document.getElementById(`day${i}`).textContent = dayNames[dayOfWeek] + ' ' + date.getDate();
     }
 }
 
@@ -177,7 +210,7 @@ async function loadMinutes() {
         const container = document.getElementById('minutesList');
         
         if (data.length === 0) {
-            container.innerHTML = '<p class="loading">등록된 회의록이 없습니다.</p>';
+            container.innerHTML = '<p class="loading">등록된 학생회 기록이 없습니다.</p>';
             return;
         }
         
@@ -185,7 +218,7 @@ async function loadMinutes() {
         
         container.innerHTML = data.map(minutes => `
             <div class="list-item">
-                <div class="item-date">📝 ${formatDate(minutes.date)}</div>
+                <div class="item-date">📋 ${formatDate(minutes.date)}</div>
                 <div class="item-title">${minutes.title}</div>
                 <div class="item-content">${minutes.content}</div>
             </div>
